@@ -1,3 +1,5 @@
+const { PermissionsBitField } = require('discord.js');
+
 const { closeButton, openButton } = require("./buttons")
 
 const { resolvedTag, forumId } = require("../../config.json");
@@ -16,11 +18,13 @@ module.exports = {
         }
     
         const appliedTags = interaction.channel.appliedTags
+        // console.log(appliedTags)
         const threadOpen = !appliedTags.includes(resolvedTag)
     
         const resolveMessage = interaction.isButton() ? await interaction.channel.messages.fetch(interaction.message.id) : {}
         
-        if (threadChannel.ownerId == interaction.user.id) {
+        const modifyAllowed = threadChannel.ownerId == interaction.user.id ||interaction.guild.members.fetch(interaction.user.id).permissions.has(PermissionsBitField.Flags.ManageMessages)
+        if (modifyAllowed) {
             if (threadOpen) {
                 interaction.channel.setAppliedTags([resolvedTag, ...appliedTags])
                 interaction.reply({
